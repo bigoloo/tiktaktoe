@@ -107,7 +107,7 @@ class TikTakToeBoardTest {
     fun `when  restart is called on controller state should return to initial state`() =
         runBlocking {
             val gameController = TikTakController()
-            val initialState = gameController.state.value
+
             gameController.move(0)//x
             gameController.move(1)//0
             gameController.move(2)//x
@@ -120,6 +120,12 @@ class TikTakToeBoardTest {
 
             gameController.restart()
 
-            assertEquals(initialState, gameController.state.value)
+            assertEquals(
+                GameState(
+                    Result.NotFinished,
+                    mutableMapOf(),
+                    Player.X
+                ), gameController.state.value
+            )
         }
 }

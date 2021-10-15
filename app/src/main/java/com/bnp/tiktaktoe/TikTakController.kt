@@ -91,7 +91,11 @@ class TikTakController() {
 
     fun restart() {
         state.value =
-            initialState
+            GameState(
+                Result.NotFinished,
+                mutableMapOf(),
+                Player.X
+            )
         playersMove.clear()
         initPlayerMoves(playersMove)
     }

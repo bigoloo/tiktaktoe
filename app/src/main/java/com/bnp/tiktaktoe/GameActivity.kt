@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.GridCells
 import androidx.compose.foundation.lazy.LazyVerticalGrid
+import androidx.compose.material.Button
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
@@ -20,6 +21,9 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import com.bnp.tiktaktoe.ui.theme.TTTTheme
 import org.koin.androidx.viewmodel.ext.android.viewModel
@@ -33,14 +37,53 @@ class GameActivity : ComponentActivity() {
         setContent {
 
             TTTTheme {
-                // A surface container using the 'background' color from the theme
-                Column() {
+                Column {
                     val state = gameViewModel.gameController.state.collectAsState()
                     GameBoard(state)
 
-                    Text(text = "state:+${state.value.result}")
-                    Text(text = "turn:+${state.value.currentTurn}")
-                    Text(text = "exception:+${state.value.exception}")
+                    Text(text = buildAnnotatedString {
+                        withStyle(SpanStyle(color = Color.Blue)) {
+                            append("Result: ")
+                        }
+                        withStyle(SpanStyle(color = Color.Black)) {
+                            append(
+                                when (val result = state.value.result) {
+                                    Result.Draw -> "Game is Draw "
+                                    Result.NotFinished -> "Game is Running"
+                                    is Result.Win -> "WINNER IS :" + when (result.player) {
+                                        Player.O -> "O"
+                                        Player.X -> "X"
+                                    }
+                                }
+                            )
+                        }
+                    })
+                    Text(text = buildAnnotatedString {
+                        withStyle(SpanStyle(color = Color.Blue)) {
+                            append("current Turn is : ")
+                        }
+                        withStyle(SpanStyle(color = Color.Black)) {
+                            append(
+                                when (val result = state.value.currentTurn) {
+                                    Player.O -> "Player O"
+                                    Player.X -> "Player X"
+                                }
+                            )
+                        }
+                    })
+                    Text(text = buildAnnotatedString {
+                        withStyle(SpanStyle(color = Color.Blue)) {
+                            append("Exception : ")
+                        }
+                        withStyle(SpanStyle(color = Color.Black)) {
+                            append(
+                                state.value.exception?.message ?: "----"
+                            )
+                        }
+                    })
+                    Button(onClick = { gameViewModel.gameController.restart() }) {
+                        Text(text = "Restart The Game")
+                    }
                 }
             }
         }

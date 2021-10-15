@@ -13,10 +13,13 @@ sealed class Result {
 
 
 val PlayerXShouldStartGameException = Exception("player X should Start The game")
-
+val PositionHasAlreadyChosenException = Exception("Position Has Already Chosen!")
 
 data class GameState(
     val result: Result,
-    val board: MutableMap<Player, MutableSet<Int>>,
-    val currentTurn: Player
-)
+    val board: MutableList<Player?>,
+    val currentTurn: Player,
+    val exception: Exception? = null
+) {
+
+}

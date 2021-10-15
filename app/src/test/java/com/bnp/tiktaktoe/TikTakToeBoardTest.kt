@@ -30,7 +30,7 @@ class TikTakToeBoardTest {
 
     @Test
     fun `when play move is successful board should be updated`() = runBlocking {
-        val gameController = TikTakController(this)
+        val gameController = TikTakController()
         gameController.move(1)
         gameController.state.test {
             val item = awaitItem()
@@ -40,7 +40,7 @@ class TikTakToeBoardTest {
 
     @Test
     fun `when Player X moves turn should be changes  to Player Y `() = runBlocking {
-        val gameController = TikTakController(this)
+        val gameController = TikTakController()
         gameController.move(1)
 
         gameController.state.test {
@@ -51,7 +51,7 @@ class TikTakToeBoardTest {
 
     @Test
     fun `when Player Y moves turn should be changes  to Player X`() = runBlocking {
-        val gameController = TikTakController(this)
+        val gameController = TikTakController()
         gameController.move(1)
         gameController.move(2)
 
@@ -63,7 +63,7 @@ class TikTakToeBoardTest {
 
     @Test
     fun `when player choose the chosen position state should has exception`() = runBlocking {
-        val gameController = TikTakController(this)
+        val gameController = TikTakController()
         gameController.move(1)
         gameController.move(1)
 
@@ -79,7 +79,7 @@ class TikTakToeBoardTest {
 
     @Test
     fun `when X Player choose fist column state should be Win( Player-X) `() = runBlocking {
-        val gameController = TikTakController(this)
+        val gameController = TikTakController()
         gameController.move(0)//x
         gameController.move(4)//0
         gameController.move(3)//x
@@ -90,7 +90,7 @@ class TikTakToeBoardTest {
 
     @Test
     fun `when Players choose 9 cells and not of them is winner it should be draw `() = runBlocking {
-        val gameController = TikTakController(this)
+        val gameController = TikTakController()
         gameController.move(0)//x
         gameController.move(1)//0
         gameController.move(2)//x
@@ -102,4 +102,24 @@ class TikTakToeBoardTest {
         gameController.move(7)//x
         assertEquals(Result.Draw, gameController.state.value.result)
     }
+
+    @Test
+    fun `when  restart is called on controller state should return to initial state`() =
+        runBlocking {
+            val gameController = TikTakController()
+            val initialState = gameController.state.value
+            gameController.move(0)//x
+            gameController.move(1)//0
+            gameController.move(2)//x
+            gameController.move(5)//0
+            gameController.move(3)//x
+            gameController.move(8)//0
+            gameController.move(4)//x
+            gameController.move(6)//0
+            gameController.move(7)//x
+
+            gameController.restart()
+
+            assertEquals(initialState, gameController.state.value)
+        }
 }

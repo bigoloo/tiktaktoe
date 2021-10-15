@@ -1,26 +1,35 @@
 package com.bnp.tiktaktoe
 
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 
 @ExperimentalStdlibApi
-class TikTakController(private val coroutineScope: CoroutineScope) {
-
+class TikTakController() {
+    private val playersMove: MutableMap<Player, IntArray> = mutableMapOf()
+    private val initialState = GameState(
+        Result.NotFinished,
+        mutableMapOf(),
+        Player.X
+    )
     val state =
         MutableStateFlow<GameState>(
-            GameState(
-                Result.NotFinished,
-                mutableMapOf(),
-                Player.X
-            )
+            initialState
         )
 
-    private val playersMove: MutableMap<Player, IntArray> = buildMap<Player, IntArray
-            > {
-        put(Player.X, IntArray(8) { 0 })
-        put(Player.O, IntArray(8) { 0 })
 
-    } as MutableMap<Player, IntArray>
+    init {
+
+        initPlayerMoves(playersMove)
+
+    }
+
+
+    private fun initPlayerMoves(playersMove: MutableMap<Player, IntArray>) {
+        playersMove.apply {
+            put(Player.X, IntArray(8) { 0 })
+            put(Player.O, IntArray(8) { 0 })
+
+        }
+    }
 
     fun move(position: Int) {
         val currentState = state.value
@@ -34,8 +43,6 @@ class TikTakController(private val coroutineScope: CoroutineScope) {
             state.value = currentState.copy(exception = PositionHasAlreadyChosenException)
         } ?: run {
             currentState.board[position] = currentState.currentTurn
-
-
             val row = position.div(3)
             val column = position.rem(3)
             playersMove[currentState.currentTurn]!![row] =
@@ -59,8 +66,6 @@ class TikTakController(private val coroutineScope: CoroutineScope) {
                             Player.X
                         )
                     )
-
-
                 playersMove[Player.O]!!.contains(3) -> state.value =
                     currentState.copy(result = Result.Win(Player.O))
 
@@ -69,12 +74,8 @@ class TikTakController(private val coroutineScope: CoroutineScope) {
                         state.value = currentState.copy(result = Result.Draw)
                     }
                 }
-
-
             }
             switchTurn()
-
-
         }
     }
 
@@ -88,11 +89,8 @@ class TikTakController(private val coroutineScope: CoroutineScope) {
 
     fun restart() {
         state.value =
-            GameState(
-                Result.NotFinished,
-                mutableMapOf<Int, Player>(),
-                Player.X
-            )
-
+            initialState
+        playersMove.clear()
+        initPlayerMoves(playersMove)
     }
 }

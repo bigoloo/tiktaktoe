@@ -1,45 +1,98 @@
 package com.bnp.tiktaktoe
 
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 
 @ExperimentalStdlibApi
-class TikTakController {
+class TikTakController(private val coroutineScope: CoroutineScope) {
 
     val state =
         MutableStateFlow<GameState>(
             GameState(
                 Result.NotFinished,
-                mutableListOf<Player?>().apply {
-                    repeat((0 until 9).count()) { add(null) }
-                },
+                mutableMapOf(),
                 Player.X
             )
         )
-    val xMoves = IntArray(8) { 0 }
-    val oMoves = IntArray(8) { 0 }
 
-    fun move(player: Player, position: Int) {
+    private val playersMove: MutableMap<Player, IntArray> = buildMap<Player, IntArray
+            > {
+        put(Player.X, IntArray(8) { 0 })
+        put(Player.O, IntArray(8) { 0 })
+
+    } as MutableMap<Player, IntArray>
+
+    fun move(position: Int) {
         val currentState = state.value
-
+        if (currentState.result == Result.Draw) {
+            state.value = currentState.copy(exception = GameIsOverException)
+            return
+        }
         state.value = currentState.copy(exception = null)
-        /*if (currentState.board.filterNotNull().size == 9) {
-            state.value = currentState.copy(exception = PlayerXShouldStartGameException)
-        }*/
 
-        currentState.board.getOrNull(position)?.let {
+        currentState.board[position]?.let {
             state.value = currentState.copy(exception = PositionHasAlreadyChosenException)
         } ?: run {
-            currentState.board.add(position, player)
+            currentState.board[position] = currentState.currentTurn
+
+
+            val row = position.div(3)
+            val column = position.rem(3)
+            playersMove[currentState.currentTurn]!![row] =
+                playersMove[currentState.currentTurn]!![row] + 1
+            playersMove[currentState.currentTurn]!![column + 3] =
+                playersMove[currentState.currentTurn]!![column + 3] + 1
+            if (position == 0 || position == 8) playersMove[currentState.currentTurn]!![6] =
+                playersMove[currentState.currentTurn]!![6] + 1
+            if (position == 2 || position == 6) playersMove[currentState.currentTurn]!![7] =
+                playersMove[currentState.currentTurn]!![7] + 1
+            if (position == 4) {
+                playersMove[currentState.currentTurn]!![6] =
+                    playersMove[currentState.currentTurn]!![6] + 1
+                playersMove[currentState.currentTurn]!![7] =
+                    playersMove[currentState.currentTurn]!![7] + 1
+            }
+            when {
+                playersMove[Player.X]!!.contains(3) -> state.value =
+                    currentState.copy(
+                        result = Result.Win(
+                            Player.X
+                        )
+                    )
+
+
+                playersMove[Player.O]!!.contains(3) -> state.value =
+                    currentState.copy(result = Result.Win(Player.O))
+
+                else -> {
+                    if (currentState.board.size == 9) {
+                        state.value = currentState.copy(result = Result.Draw)
+                    }
+                }
+
+
+            }
             switchTurn()
+
+
         }
-
-
     }
+
 
     private fun switchTurn() {
         when (state.value.currentTurn) {
             Player.O -> state.value = state.value.copy(currentTurn = Player.X)
             Player.X -> state.value = state.value.copy(currentTurn = Player.O)
         }
+    }
+
+    fun restart() {
+        state.value =
+            GameState(
+                Result.NotFinished,
+                mutableMapOf<Int, Player>(),
+                Player.X
+            )
+
     }
 }

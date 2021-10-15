@@ -11,13 +11,12 @@ sealed class Result {
     object NotFinished : Result()
 }
 
-
-val PlayerXShouldStartGameException = Exception("player X should Start The game")
 val PositionHasAlreadyChosenException = Exception("Position Has Already Chosen!")
+val GameIsOverException = Exception("Game is over")
 
 data class GameState(
     val result: Result,
-    val board: MutableList<Player?>,
+    val board: MutableMap<Int,Player>,
     val currentTurn: Player,
     val exception: Exception? = null
 ) {

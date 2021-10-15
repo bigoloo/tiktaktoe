@@ -10,3 +10,13 @@ sealed class Result {
     object Draw : Result()
     object NotFinished : Result()
 }
+
+
+val PlayerXShouldStartGameException = Exception("player X should Start The game")
+
+
+data class GameState(
+    val result: Result,
+    val board: MutableMap<Player, MutableSet<Int>>,
+    val currentTurn: Player
+)

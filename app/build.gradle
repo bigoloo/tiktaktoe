@@ -72,5 +72,6 @@ dependencies {
     implementation "io.insert-koin:koin-androidx-compose:$koin_version"
     implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:$lifecycle_version"
     implementation "androidx.lifecycle:lifecycle-viewmodel-compose:$lifecycle_version"
+    testImplementation 'app.cash.turbine:turbine:0.6.1'
 
 }

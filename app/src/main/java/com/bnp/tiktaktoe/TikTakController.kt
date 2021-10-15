@@ -1,18 +1,29 @@
 package com.bnp.tiktaktoe
 
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
 
 class TikTakController {
 
-    private val _result = MutableStateFlow<Result>(Result.NotFinished)
-    val result: StateFlow<Result> = _result
+    val state =
+        MutableStateFlow<GameState>(GameState(Result.NotFinished, mutableMapOf(), Player.X))
 
-   private  val moves = mutableMapOf<Player, List<Int>>()
 
     fun move(player: Player, position: Int) {
-        if (moves.isEmpty() && player != Player.X) throw PlayerXShouldStartGameException
+        if (state.value.board.isEmpty() && player != Player.X) throw PlayerXShouldStartGameException
+
+        if (!state.value.board.containsKey(player)) {
+            state.value.board[player] = mutableSetOf<Int>(position)
+        } else {
+            state.value.board[player]!!.add(position)
+        }
+
+        switchTurn()
+    }
+
+    private fun switchTurn() {
+        when (state.value.currentTurn) {
+            Player.O -> state.value = state.value.copy(currentTurn = Player.X)
+            Player.X ->  state.value = state.value.copy(currentTurn = Player.O)
+        }
     }
 }
-
-val PlayerXShouldStartGameException = Exception("player X should Start The game")

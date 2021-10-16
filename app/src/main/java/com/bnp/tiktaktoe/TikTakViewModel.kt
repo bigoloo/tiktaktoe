@@ -4,7 +4,4 @@ import androidx.lifecycle.ViewModel
 
 class TikTakViewModel : ViewModel() {
     val gameController = TikTakController()
-
-
-
 }

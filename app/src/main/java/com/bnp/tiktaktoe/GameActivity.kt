@@ -21,6 +21,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.withStyle
@@ -39,83 +40,95 @@ class GameActivity : ComponentActivity() {
             TTTTheme {
                 Column {
                     val state = gameViewModel.gameController.state.collectAsState()
-                    GameBoard(state)
-
-                    Text(text = buildAnnotatedString {
-                        withStyle(SpanStyle(color = Color.Blue)) {
-                            append("Result: ")
-                        }
-                        withStyle(SpanStyle(color = Color.Black)) {
-                            append(
-                                when (val result = state.value.result) {
-                                    Result.Draw -> "Game is Draw "
-                                    Result.NotFinished -> "Game is Running"
-                                    is Result.Win -> "WINNER IS :" + when (result.player) {
-                                        Player.O -> "O"
-                                        Player.X -> "X"
-                                    }
-                                }
-                            )
-                        }
-                    })
-                    Text(text = buildAnnotatedString {
-                        withStyle(SpanStyle(color = Color.Blue)) {
-                            append("current Turn is : ")
-                        }
-                        withStyle(SpanStyle(color = Color.Black)) {
-                            append(
-                                when (val result = state.value.currentTurn) {
-                                    Player.O -> "Player O"
-                                    Player.X -> "Player X"
-                                }
-                            )
-                        }
-                    })
-                    Text(text = buildAnnotatedString {
-                        withStyle(SpanStyle(color = Color.Blue)) {
-                            append("Exception : ")
-                        }
-                        withStyle(SpanStyle(color = Color.Black)) {
-                            append(
-                                state.value.exception?.message ?: "----"
-                            )
-                        }
-                    })
-                    Button(onClick = { gameViewModel.gameController.restart() }) {
-                        Text(text = "Restart The Game")
+                    GameBoard(state) {
+                        gameViewModel.gameController.move(it)
+                    }
+                    InfoSection(state) {
+                        gameViewModel.gameController.restart()
                     }
                 }
             }
         }
     }
 
-    @Composable
-    private fun GameBoard(state: State<GameState>) {
-        LazyVerticalGrid(
-            modifier = Modifier.wrapContentSize(),
-            cells = GridCells.Fixed(3),
-        ) {
-            items(9) {
-                Column(
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    modifier = Modifier
-                        .height(40.dp)
-                        .width(40.dp)
+}
 
-                        .clickable {
-                            gameViewModel.gameController.move(it)
-                        }
-                        .border(3.dp, color = Color.Cyan)
-                ) {
-                    Text(
-                        text = when (state.value.board[it]) {
-                            Player.O -> "O"
-                            Player.X -> "X"
-                            null -> ""
-                        }
-                    )
 
+@Composable
+fun InfoSection(state: State<GameState>, restartCallBack: () -> Unit) {
+    Text(text = buildAnnotatedString {
+        withStyle(SpanStyle(color = Color.Blue)) {
+            append("Result: ")
+        }
+        withStyle(SpanStyle(color = Color.Black)) {
+            append(
+                when (val result = state.value.result) {
+                    Result.Draw -> "Game is Draw "
+                    Result.NotFinished -> "Game is Running"
+                    is Result.Win -> "WINNER IS :" + when (result.player) {
+                        Player.O -> "O"
+                        Player.X -> "X"
+                    }
                 }
+            )
+        }
+    })
+    Text(text = buildAnnotatedString {
+        withStyle(SpanStyle(color = Color.Blue)) {
+            append("current Turn is : ")
+        }
+        withStyle(SpanStyle(color = Color.Black)) {
+            append(
+                when (state.value.currentTurn) {
+                    Player.O -> "Player O"
+                    Player.X -> "Player X"
+                }
+            )
+        }
+    })
+    Text(text = buildAnnotatedString {
+        withStyle(SpanStyle(color = Color.Blue)) {
+            append("Exception : ")
+        }
+        withStyle(SpanStyle(color = Color.Black)) {
+            append(
+                state.value.exception?.message ?: "----"
+            )
+        }
+    })
+    Button(modifier = Modifier.testTag("restart_button"), onClick = { restartCallBack() }) {
+        Text(text = "Restart The Game")
+    }
+}
+
+@OptIn(ExperimentalFoundationApi::class)
+@Composable
+fun GameBoard(state: State<GameState>, callback: (position: Int) -> Unit) {
+    LazyVerticalGrid(
+        modifier = Modifier.wrapContentSize(),
+        cells = GridCells.Fixed(3),
+    ) {
+        items(9) {
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                modifier = Modifier
+                    .testTag("$it")
+                    .height(40.dp)
+                    .width(40.dp)
+
+                    .clickable {
+                        callback(it)
+                    }
+                    .border(3.dp, color = Color.Cyan)
+            ) {
+                Text(
+                    text = when (state.value.board[it]) {
+                        Player.O -> "O"
+                        Player.X -> "X"
+                        null -> ""
+                    }
+                )
+
             }
         }
     }

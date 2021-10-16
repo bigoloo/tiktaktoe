@@ -19,6 +19,4 @@ data class GameState(
     val board: MutableMap<Int,Player>,
     val currentTurn: Player,
     val exception: Exception? = null
-) {
-
-}
+)

@@ -10,9 +10,9 @@ A game in which two players alternately put Xs and Os in compartments of a figur
 
 ## Algorithm
 
-To Find the Result of the game, we need to callculate the Board values.
+To Find the Result of the game, we need to calculate the Board values.
 
-Create two array with lentgh of 8 to store the win's premutation of X and O.Every element in above arrays should be zero at first. When one the users move, we find __corresponding__ index of array and increase it. At last, after each move we search on array and found 3 on it. The first user's array that reaches 3 is winner or if there is no empty cell.
+Create two array with length of 8 to store the win's permutation of X and O.Every element in above arrays should be zero at first. When one the users move, we find __corresponding__ index of array and increase it. At last, after each move we search on array and found 3 on it. The first user's array that reaches 3 is winner or if there is no empty cell.
 
 ##### Corresponding:
 Assume we have an Array of 9 zero ->

@@ -36,7 +36,6 @@ class GameActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-
             TTTTheme {
                 Column {
                     val state = gameViewModel.gameController.state.collectAsState()

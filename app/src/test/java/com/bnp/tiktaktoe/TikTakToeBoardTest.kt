@@ -1,6 +1,7 @@
 package com.bnp.tiktaktoe
 
 import app.cash.turbine.test
+import junit.framework.Assert.assertEquals
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.newSingleThreadContext
 import kotlinx.coroutines.runBlocking
@@ -9,7 +10,6 @@ import kotlinx.coroutines.test.setMain
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
-import kotlin.test.assertEquals
 import kotlin.time.ExperimentalTime
 
 @ExperimentalStdlibApi

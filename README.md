@@ -7,6 +7,7 @@ A game in which two players alternately put Xs and Os in compartments of a figur
 - Implement with TDD approach
 - Using ServiceLocator (Koin)
 - Implement with Compose
+- Integrated with github Workflows
 
 ## Algorithm
 
@@ -29,9 +30,9 @@ for example if user chooses 5 the array becomes : [0,1,0, 0,1,0, 1,1]
 
 ## How to install
 
-There are two for installing the Application
+To generate APK file do the bellow command
  ```
   ./gradlew assembleDebug
  ```
-And github Active
+
 

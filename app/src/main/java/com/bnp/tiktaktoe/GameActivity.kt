@@ -4,15 +4,11 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.animation.ExperimentalAnimationApi
-import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.foundation.*
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.GridCells
 import androidx.compose.foundation.lazy.LazyVerticalGrid
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Button
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
@@ -20,8 +16,11 @@ import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.withStyle
@@ -37,7 +36,12 @@ class GameActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             TTTTheme {
-                Column {
+                Column(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalArrangement = Arrangement.SpaceBetween,
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+
                     val state = gameViewModel.gameController.state.collectAsState()
                     GameBoard(state) {
                         gameViewModel.gameController.move(it)
@@ -57,7 +61,7 @@ class GameActivity : ComponentActivity() {
 fun InfoSection(state: State<GameState>, restartCallBack: () -> Unit) {
     Text(text = buildAnnotatedString {
         withStyle(SpanStyle(color = Color.Blue)) {
-            append("Result: ")
+            append("Status: ")
         }
         withStyle(SpanStyle(color = Color.Black)) {
             append(
@@ -74,7 +78,7 @@ fun InfoSection(state: State<GameState>, restartCallBack: () -> Unit) {
     })
     Text(text = buildAnnotatedString {
         withStyle(SpanStyle(color = Color.Blue)) {
-            append("current Turn is : ")
+            append("Current Turn is : ")
         }
         withStyle(SpanStyle(color = Color.Black)) {
             append(
@@ -85,17 +89,24 @@ fun InfoSection(state: State<GameState>, restartCallBack: () -> Unit) {
             )
         }
     })
-    Text(text = buildAnnotatedString {
-        withStyle(SpanStyle(color = Color.Blue)) {
-            append("Exception : ")
-        }
-        withStyle(SpanStyle(color = Color.Black)) {
-            append(
-                state.value.exception?.message ?: "----"
-            )
-        }
-    })
-    Button(modifier = Modifier.testTag("restart_button"), onClick = { restartCallBack() }) {
+    state.value.exception?.let {
+        Text(text = buildAnnotatedString {
+            withStyle(SpanStyle(color = Color.Blue)) {
+                append("Exception : ")
+            }
+            withStyle(SpanStyle(color = Color.Black)) {
+                append(
+                    it.message!!
+                )
+            }
+        })
+    }
+
+    Button(
+        modifier = Modifier
+            .testTag("restart_button")
+            .padding(10.dp),
+        onClick = { restartCallBack() }) {
         Text(text = "Restart The Game")
     }
 }
@@ -104,29 +115,57 @@ fun InfoSection(state: State<GameState>, restartCallBack: () -> Unit) {
 @Composable
 fun GameBoard(state: State<GameState>, callback: (position: Int) -> Unit) {
     LazyVerticalGrid(
-        modifier = Modifier.wrapContentSize(),
+        modifier = Modifier
+            .padding(30.dp)
+            .width(200.dp)
+            .clip(RoundedCornerShape(8.dp))
+            .background(color = colorResource(id = R.color.board_background))
+            .border(
+                8.dp, color = Color.Black,
+            ),
+
         cells = GridCells.Fixed(3),
     ) {
         items(9) {
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center,
                 modifier = Modifier
                     .testTag("$it")
                     .height(40.dp)
                     .width(40.dp)
-
                     .clickable {
                         callback(it)
                     }
-                    .border(3.dp, color = Color.Cyan)
+                    .border(2.dp, color = Color.Black)
             ) {
-                Text(
-                    text = when (state.value.board[it]) {
-                        Player.O -> "O"
-                        Player.X -> "X"
-                        null -> ""
+
+                when (state.value.board[it]) {
+                    Player.O -> {
+                        Image(
+                            modifier = Modifier
+                                .width(30.dp)
+                                .width(30.dp),
+                            painter = painterResource(
+                                id = R.drawable.ic_o_player,
+                            ), contentDescription = "O player"
+
+                        )
                     }
-                )
+                    Player.X -> Image(
+                        modifier = Modifier
+                            .width(30.dp)
+                            .width(30.dp),
+                        painter = painterResource(
+                            id = R.drawable.ic_x_player,
+                        ), contentDescription = "x player"
+
+                    )
+                    else -> {
+
+                    }
+                }
+
 
             }
         }

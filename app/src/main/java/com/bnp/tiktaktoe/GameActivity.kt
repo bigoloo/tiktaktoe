@@ -42,12 +42,12 @@ class GameActivity : ComponentActivity() {
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
 
-                    val state = gameViewModel.gameController.state.collectAsState()
+                    val state = gameViewModel.gameState.collectAsState()
                     GameBoard(state) {
-                        gameViewModel.gameController.move(it)
+                        gameViewModel.move(it)
                     }
                     InfoSection(state) {
-                        gameViewModel.gameController.restart()
+                        gameViewModel.restartGame()
                     }
                 }
             }

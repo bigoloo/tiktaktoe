@@ -7,7 +7,7 @@ A game in which two players alternately put Xs and Os in compartments of a figur
 - Implement with TDD approach
 - Using ServiceLocator (Koin)
 - Implement with Compose
-- Integrated with github Workflows
+- Integrated with github Workflows (Now it run the tests every time that commits is pushed )
 
 ## Algorithm
 
